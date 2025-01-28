@@ -20,6 +20,7 @@ jobs:
         working-directory: rentalService
         run: |
           export SHELL=/bin/bash
+          chmod +x ./gradlew
           ./gradlew build
           eval $(minikube docker-env)
           docker build -f ./Dockerfile -t rentalservice .
