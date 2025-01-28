@@ -1,4 +1,4 @@
-# lsi1
+# lsi2
 
 ### Coding rules
 
@@ -80,20 +80,8 @@ docker login -u username -p password
 
 Push the image to the docker hub:
 ```
-docker push yourDockerHubName/imageName:version
+docker push sophieminos/rental-service:latest
 ```
-
-Example: `docker push myDockerID/myservice:1`
-
-#### Change the image in the deployment file
-
-https://github.com/charroux/lsi1/blob/main/deployment.yml
-
-#### Deploy the app in Minikube
-```
-kubectl apply -f deployement.yml
-```
-
 
 ### Launch a workflow when the code is updated
 
@@ -149,53 +137,7 @@ Start Kubernetes minikube:
 minikube start --cpus=2 --memory=5000 --driver=docker
 ```
 
-### Deploy via command
-```
-kubectl create deployment rentalservice --image=charroux/rentalservice:1
-```
-
-Change the image from the Docker Hub.
-
-Add a service:
-```
-kubeclt expose deployment rentalservice --type=LoadBalancer   ```
-```
-Get the URL of the service:
-```
-minikube service rentalService --url  
-```
-
-Test in a browser
-```
-http://127.0.0.1:51300/cars  
-```
-Take care at the address
-
-### Deploy via a yalm file
-
-Launch the deployment:
-```
-kubectl apply -f deployment.yml  
-```
-
-Notice the image used at line 23. You should use your onw image from the Docker Hub
-
-Chek is the pods is running:
-```
-kubectl get pods
-```
-
-Get the URL of the service:
-```
-minikube service rentalService --url  
-```
-
-Test in a browser
-```
-http://127.0.0.1:51300/cars  
-```
-Take care at the address
-
+---
 
 ### Install Istio
 https://istio.io/latest/docs/setup/getting-started/
@@ -216,19 +158,57 @@ Install the Istio addons (Kiali, Prometheus, Jaeger, Grafana):
 ```
 kubectl apply -f samples/addons
 ```
-## 
 Enable auto-injection of the Istio side-cars when the pods are started:
 ```
 kubectl label namespace default istio-injection=enabled
 ```
+---
+### Deploy via command
+```
+kubectl create deployment rentalservice --image=sophieminos/rental-service:latest
+```
+Change the image from the Docker Hub.
 
+Add a service:
+```
+kubectl expose deployment rentalservice --type=LoadBalancer   ```
+```
+Get the URL of the service:
+```
+minikube service rentalService --url  
+```
+Test in a browser
+```
+http://127.0.0.1:51300/cars  
+```
+---
+
+### Deploy via a yalm file
+
+Launch the deployment:
+```
+kubectl apply -f deployment.yml  
+```
+Chek is the pods is running:
+```
+kubectl get pods
+```
+Get the URL of the service:
+```
+minikube service rentalService --url  
+```
+Test in a browser
+```
+http://127.0.0.1:51300/cars  
+```
+---
 Configure Docker so that it uses the Kubernetes cluster:
 ```
 minikube docker-env
 eval $(minikube -p minikube docker-env)
 eval $(minikube docker-env)  
 ```
-
+---
 ### Kubernetes Gateway
 
 Check the configuration at 54: https://github.com/charroux/lsi1/blob/main/deployment.yml
@@ -239,10 +219,9 @@ Then get the address of the gateway:
 ```
 kubectl -n istio-system port-forward deployment/istio-ingressgateway 31380:8080  
 ```
-
 and finally test in your browser:
 http://localhost:31380/rentalservice/cars
-
+---
 ### Monotoring (service mesh)
 #### Display the Kiali dashboard
 Kiali is a console for Istio service mesh.
@@ -264,3 +243,4 @@ kubectl -n istio-system port-forward deployment/grafana 3000:3000
 ```
 http://localhost:3000/
 
+---
