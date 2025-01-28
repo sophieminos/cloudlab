@@ -32,7 +32,7 @@ public class RentalWebService {
         return rentalService.getCars();
     }
 
-    @GetMapping("/car/{plateNumber}")
+    @GetMapping("/cars/{plateNumber}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Car aCar(
@@ -41,7 +41,7 @@ public class RentalWebService {
         return rentalService.getCar(plateNumber);
     }
 
-    @PutMapping(value = "/car/{plateNumber}")
+    @PutMapping(value = "/cars/{plateNumber}")
     @ResponseStatus(HttpStatus.OK)
     public void rentOrGetBack(
             @PathVariable("plateNumber") String plateNumber,
