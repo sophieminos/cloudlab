@@ -14,4 +14,6 @@ public interface RentalService {
     public void rent(String plateNumber, String begin, String end) throws CarNotFoundException;
 
     public void getBack(String plateNumber) throws CarNotFoundException;
+
+    void addCar(Car car);
 }
