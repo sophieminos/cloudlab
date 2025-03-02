@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Louer une voiture</h2>
+<div mat-dialog-content>
+  <p>Marque: {{ car.brand }}</p>
+  <p>Numéro de plaque: {{ car.plateNumber }}</p>
+  <p>Prix: {{ car.price | currency:'EUR':'symbol' }}</p>
+
+  <form [formGroup]="rentForm" (ngSubmit)="onSubmit()">
+    <input type="hidden" formControlName="carId">
+    <input type="hidden" formControlName="plateNumber">
+    <div>
+      <label for="beginDate">Date de début :</label>
+      <input type="date" formControlName="begin" id="beginDate" required />
+    </div>
+    <div>
+      <label for="endDate">Date de fin :</label>
+      <input type="date" formControlName="end" id="endDate" required />
+    </div>
+
+    <button mat-button type="submit" [disabled]="rentForm.invalid">Louer</button>
+    <button mat-button (click)="onCancel()">Annuler</button>
+  </form>
+</div>

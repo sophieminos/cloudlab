@@ -1,0 +1,42 @@
+<hr/>
+<button (click)="toggleDetails()">
+  {{ showDetails ? 'Cacher les details' : 'Voir les details' }}
+</button>
+<hr/>
+<div class="car-grid">
+  <div class="car-card" *ngFor="let car of cars">
+    <div class="car-content">
+      <div class="left-side-card">
+        <h3>{{ car.brand }} ({{ car.plateNumber }})</h3>
+        <p><strong>Prix:</strong> {{ car.price | currency:'EUR':'symbol' }}</p>
+        <p><strong>Disponible:</strong> {{ car.rent ? 'Non' : 'Oui' }}</p>
+        <button (click)="toggleRent(car)">
+          {{ car.rent ? 'Rendre' : 'Louer' }}
+        </button>
+      </div>
+      <div class="right-side-card">
+        <img class="card-image "[src]="'images/car-placeholder.png'" alt="Car Placeholder"/>
+      </div>
+    </div>
+    <div class="footer-card">
+      <div *ngIf="showDetails">
+        <div *ngIf="car.rent && car.dates?.length">
+          <h4>Dates de location :</h4>
+          <ul>
+            <li *ngFor="let date of car.dates">
+              Du {{ date.begin | date:'dd/MM/yyyy' }} au {{ date.end | date:'dd/MM/yyyy' }}
+            </li>
+          </ul>
+        </div>
+        <div *ngIf="!car.rent && !car.dates?.length">
+          Aucune location
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
