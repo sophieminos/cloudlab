@@ -1,32 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
-  labels:
-    app: rentalservice
-    version: "1.0"
   name: rentalservice
 spec:
   replicas: 2
   selector:
     matchLabels:
       app: rentalservice
-  strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: rentalservice
     spec:
       containers:
         - name: rentalservice
           image: sophieminos/rental-service:latest
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/db_gowheel
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: password
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
-          resources: {}
-      restartPolicy: Always
-status: {}
 
 ---
 
@@ -89,3 +93,98 @@ spec:
             port:
               number: 80
             host: rentalservice.default.svc.cluster.local
+      corsPolicy:
+        allowOrigin:
+          - http://127.0.0.1:4200
+          - http://localhost:4200
+          - http://127.0.0.1:31380
+          - http://localhost:31380
+        allowMethods:
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "DELETE"
+          - "OPTIONS"
+        allowHeaders:
+          - "Authorization"
+          - "Content-Type"
+        allowCredentials: true
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carfrontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rentalfrontend
+  template:
+    metadata:
+      labels:
+        app: rentalfrontend
+    spec:
+      containers:
+        - name: rentalfrontend
+          image: sophieminos/rental-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: carfrontend
+spec:
+  ports:
+    - name: http
+      targetPort: 80
+      port: 80
+  type: ClusterIP
+  selector:
+    app: rentalfrontend
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: carfrontend
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - microservice-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            port:
+              number: 80
+            host: carfrontend.default.svc.cluster.local
+
+---
+"""
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all-requests
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: carservice
+  action: ALLOW
+  rules:
+    - to:
+        - operation:
+            methods: ["GET", "PUT", "POST", "DELETE"]
+            paths: ["/rentalservice/car/*"]
+"""
